@@ -113,9 +113,12 @@ namespace Win2FA
             this.Top = workingArea.Bottom - this.Height - 10;
         }
 
+        public DateTime LastHiddenTime { get; private set; } = DateTime.MinValue;
+
         private void Window_Deactivated(object sender, EventArgs e)
         {
             this.Hide();
+            LastHiddenTime = DateTime.UtcNow;
         }
     }
 }
