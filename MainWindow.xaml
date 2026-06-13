@@ -97,6 +97,12 @@
                                 Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" 
                                 BorderThickness="1" CornerRadius="8" Cursor="Hand" MouseLeftButtonUp="Card_MouseLeftButtonUp"
                                 ToolTip="Click card to copy 2FA Code">
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Edit Account Details" Click="EditKey_Click"/>
+                                    <MenuItem Header="Delete Account" Click="DeleteKey_Click"/>
+                                </ContextMenu>
+                            </Border.ContextMenu>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -163,7 +169,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="CANCEL" Click="CancelManualAdd_Click" Height="32" Margin="0,0,5,0" Background="#1F1F2E" Foreground="{DynamicResource TextBrush}" BorderThickness="0">
+                        <Button Grid.Column="0" Content="CANCEL" Click="CancelManualAdd_Click" Height="32" Margin="0,0,5,0" Background="{DynamicResource CardBgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="4"/>
@@ -171,6 +177,53 @@
                             </Button.Resources>
                         </Button>
                         <Button Grid.Column="1" Content="SAVE KEY" Click="SaveManualAdd_Click" Height="32" Margin="5,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="#000000" FontWeight="Bold" BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Edit Account Modal Overlay -->
+        <Grid x:Name="EditAccountModal" Grid.Row="0" Grid.RowSpan="4" Background="#CC000000" Visibility="Collapsed" Panel.ZIndex="1000">
+            <Border Width="350" Height="230" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Row 0: Header -->
+                        <RowDefinition Height="*"/>    <!-- Row 1: Content -->
+                        <RowDefinition Height="Auto"/> <!-- Row 2: Buttons -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <TextBlock Grid.Row="0" Text="EDIT AUTHENTICATOR" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontFamily="Consolas" Margin="0,0,0,15"/>
+
+                    <!-- Fields -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Text="Issuer / Provider" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="EditIssuerBox" Height="28" Padding="8,4" Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" CaretBrush="{DynamicResource AccentBrush}"/>
+
+                        <TextBlock Text="Account Name / Email" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,3"/>
+                        <TextBox x:Name="EditAccountBox" Height="28" Padding="8,4" Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" CaretBrush="{DynamicResource AccentBrush}"/>
+                    </StackPanel>
+
+                    <!-- Footer Buttons -->
+                    <Grid Grid.Row="2" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="CANCEL" Click="CancelEdit_Click" Height="32" Margin="0,0,5,0" Background="{DynamicResource CardBgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Grid.Column="1" Content="SAVE CHANGES" Click="SaveEdit_Click" Height="32" Margin="5,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="#000000" FontWeight="Bold" BorderThickness="0">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius" Value="4"/>
