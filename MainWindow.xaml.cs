@@ -32,6 +32,7 @@ namespace Win2FA
         private System.Windows.Forms.NotifyIcon? _notifyIcon;
         private TrayWindow? _trayWindow;
         private string _currentThemeMode = "system";
+        private string _editingEntryId = "";
 
         public MainWindow()
         {
@@ -569,8 +570,23 @@ namespace Win2FA
                     {
                         if (_trayWindow != null)
                         {
-                            _trayWindow.PopulateAndShow(_allEntries);
+                            // If the tray window was closed/hidden extremely recently (within 300ms),
+                            // it means the click itself deactivated and hid the window, so we do not reopen it.
+                            if ((DateTime.UtcNow - _trayWindow.LastHiddenTime).TotalMilliseconds > 300)
+                            {
+                                _trayWindow.PopulateAndShow(_allEntries);
+                            }
                         }
+                    }
+                };
+
+                _notifyIcon.MouseDoubleClick += (object? s, System.Windows.Forms.MouseEventArgs e) =>
+                {
+                    if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                    {
+                        this.Show();
+                        this.Activate();
+                        this.WindowState = WindowState.Normal;
                     }
                 };
 
@@ -719,6 +735,75 @@ namespace Win2FA
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to save startup configuration: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EditKey_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var contextMenu = menuItem?.Parent as ContextMenu;
+            var border = contextMenu?.PlacementTarget as Border;
+            var key = border?.DataContext as ObservableKey;
+            if (key != null)
+            {
+                _editingEntryId = key.Id;
+                EditIssuerBox.Text = key.Issuer;
+                EditAccountBox.Text = key.AccountName;
+                EditAccountModal.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CancelEdit_Click(object sender, RoutedEventArgs e)
+        {
+            EditAccountModal.Visibility = Visibility.Collapsed;
+            _editingEntryId = "";
+        }
+
+        private void SaveEdit_Click(object sender, RoutedEventArgs e)
+        {
+            string issuer = EditIssuerBox.Text.Trim();
+            string account = EditAccountBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(account))
+            {
+                MessageBox.Show("Issuer and Account Name cannot be empty.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var entry = _allEntries.FirstOrDefault(ent => ent.Id == _editingEntryId);
+            if (entry != null)
+            {
+                entry.Issuer = issuer;
+                entry.AccountName = account;
+
+                // Save encrypted
+                Vault.SaveEntries(_allEntries);
+                RefreshDisplayList();
+            }
+
+            EditAccountModal.Visibility = Visibility.Collapsed;
+            _editingEntryId = "";
+        }
+
+        private void DeleteKey_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var contextMenu = menuItem?.Parent as ContextMenu;
+            var border = contextMenu?.PlacementTarget as Border;
+            var key = border?.DataContext as ObservableKey;
+            if (key != null)
+            {
+                var result = MessageBox.Show($"Are you sure you want to permanently delete the 2FA key for '{key.Issuer} ({key.AccountName})'?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    var entry = _allEntries.FirstOrDefault(ent => ent.Id == key.Id);
+                    if (entry != null)
+                    {
+                        _allEntries.Remove(entry);
+                        Vault.SaveEntries(_allEntries);
+                        RefreshDisplayList();
+                    }
+                }
             }
         }
     }
