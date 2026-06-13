@@ -1,0 +1,185 @@
+<Window x:Class="Win2FA.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Win2FA - Secure Offline Authenticator" Icon="icon.ico" 
+        Height="650" Width="800"
+        Background="{DynamicResource BgBrush}"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <!-- Title Bar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Action Bar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Active Keys Grid -->
+            <RowDefinition Height="*"/>
+            <!-- Countdown bar -->
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="WIN2FA SECURE VAULT" FontSize="20" FontWeight="Black" Foreground="{DynamicResource AccentBrush}" FontFamily="Courier New"/>
+                <TextBlock Text="100% OFFLINE DATA PROTECTION • WINDOWS DPAPI HARDENED" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            
+            <!-- Compact Flat Vector Theme Toggle Button (Stroke and StrokeThickness added for visible sun rays) -->
+            <Button x:Name="ThemeButton" Grid.Column="1" Click="ThemeButton_Click" 
+                    Background="Transparent" BorderThickness="0" Width="36" Height="36" Padding="6" Cursor="Hand" 
+                    ToolTip="Toggle Theme (System / Dark / Light)">
+                <Path x:Name="ThemeIconPath" Stretch="Uniform" 
+                      Fill="{DynamicResource AccentBrush}" 
+                      Stroke="{DynamicResource AccentBrush}" 
+                      StrokeThickness="1.5" 
+                      Data="M6 4.5a3 3 0 110 6 3 3 0 010-6z M6 1v2 M6 11v2 M1.5 7.5h2 M9.5 7.5h2 M2.46 3.96l1.42 1.42 M9.54 3.96l-1.42 1.42 M2.46 11.04l1.42-1.42 M9.54 11.04l-1.42-1.42 M14 4a4.5 4.5 0 104.5 4.5 4.9 4.9 0 01-4.5-4.5z"/>
+            </Button>
+        </Grid>
+
+        <!-- Action Bar -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="SearchBox" Grid.Column="0" Height="36" Padding="12,8" FontSize="13" 
+                     Background="{DynamicResource CardBgBrush}" Foreground="{DynamicResource TextBrush}" 
+                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                     VerticalContentAlignment="Center" CaretBrush="{DynamicResource AccentBrush}"
+                     TextChanged="SearchBox_TextChanged" GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus"/>
+            
+            <TextBlock x:Name="WatermarkText" Grid.Column="0" Text="Search authenticators..." Foreground="{DynamicResource MutedTextBrush}" 
+                       FontSize="13" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0"/>
+
+            <!-- ADD SINGLE KEY manual dialog trigger button -->
+            <Button Grid.Column="1" Content="ADD SINGLE KEY" Click="AddSingleKey_Click" Margin="10,0,0,0" Height="36" Padding="15,0"
+                    Background="{DynamicResource CardBgBrush}" Foreground="{DynamicResource TextBrush}" 
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" FontWeight="Bold" FontSize="11" FontFamily="Consolas">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <!-- IMPORT QR SCREENSHOT button -->
+            <Button Grid.Column="2" Content="IMPORT QR SCREENSHOT" Click="ImportQR_Click" Margin="10,0,0,0" Height="36" Padding="15,0"
+                    Background="{DynamicResource AccentBrush}" Foreground="#000000" FontWeight="Bold" FontSize="11" FontFamily="Consolas" BorderThickness="0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+
+        <!-- Grid of Cards -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="KeysItemsControl">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Clickable Soft-UI Dark Card -->
+                        <Border Width="235" Height="105" Margin="5" Padding="15" 
+                                Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" CornerRadius="8" Cursor="Hand" MouseLeftButtonUp="Card_MouseLeftButtonUp"
+                                ToolTip="Click card to copy 2FA Code">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Card Head -->
+                                <StackPanel Grid.Row="0">
+                                    <TextBlock Text="{Binding Issuer}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding AccountName}" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource TextBrush}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+
+                                <!-- Code Output (Perfectly Centered) -->
+                                <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                    <TextBlock Text="{Binding Code, Mode=OneWay}" FontSize="28" FontWeight="Black" 
+                                               Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               FontFamily="Consolas"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Cyclic sync countdown -->
+        <Grid Grid.Row="3" Margin="0,15,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="SecondsRemainingText" Text="30s" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,10,0" VerticalAlignment="Center" FontSize="12" FontFamily="Consolas"/>
+            <ProgressBar x:Name="TimeProgressBar" Grid.Column="1" Height="4" Maximum="30" Value="30" Foreground="{DynamicResource AccentBrush}" Background="#1F1F2E" BorderThickness="0"/>
+        </Grid>
+
+        <!-- Add Account Modal Overlay (Manual single key entry) -->
+        <Grid x:Name="AddAccountModal" Grid.Row="0" Grid.RowSpan="4" Background="#CC000000" Visibility="Collapsed" Panel.ZIndex="1000">
+            <Border Width="350" Height="290" Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <TextBlock Grid.Row="0" Text="ADD NEW AUTHENTICATOR" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontFamily="Consolas" Margin="0,0,0,15"/>
+
+                    <!-- Fields -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Text="Issuer / Provider" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="ManualIssuerBox" Height="28" Padding="8,4" Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+
+                        <TextBlock Text="Account Name / Email" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,3"/>
+                        <TextBox x:Name="ManualAccountBox" Height="28" Padding="8,4" Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}"/>
+
+                        <TextBlock Text="Base32 Secret Key" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource MutedTextBrush}" Margin="0,8,0,3"/>
+                        <TextBox x:Name="ManualSecretBox" Height="28" Padding="8,4" Background="{DynamicResource BgBrush}" Foreground="{DynamicResource TextBrush}" BorderBrush="{DynamicResource BorderBrush}" CaretBrush="{DynamicResource AccentBrush}"/>
+                    </StackPanel>
+
+                    <!-- Footer Buttons -->
+                    <Grid Grid.Row="2" Margin="0,5,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="CANCEL" Click="CancelManualAdd_Click" Height="32" Margin="0,0,5,0" Background="#1F1F2E" Foreground="{DynamicResource TextBrush}" BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Grid.Column="1" Content="SAVE KEY" Click="SaveManualAdd_Click" Height="32" Margin="5,0,0,0" Background="{DynamicResource AccentBrush}" Foreground="#000000" FontWeight="Bold" BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

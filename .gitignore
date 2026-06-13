@@ -1,0 +1,30 @@
+## Ignore Visual Studio Temporary Files, Build Results, and User Settings
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Re]leasePublic/
+x64/
+x86/
+[Aa]R[Mm]/
+[Aa]R[Mm]64/
+bld/
+[Bin]/
+[Ob]j/
+Log/
+Logs/
+
+# Visual Studio 2015/2017/2019/2022 cache and settings
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Custom user databases
+*.db
+vault.db
