@@ -8,7 +8,7 @@ namespace Win2FA
 {
     public partial class App : System.Windows.Application
     {
-        private static Mutex _mutex = null;
+        private static Mutex? _mutex = null;
 
         protected override void OnStartup(StartupEventArgs e)
         {
