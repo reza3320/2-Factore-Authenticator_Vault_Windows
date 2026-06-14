@@ -5,8 +5,16 @@ Win2FA is a highly-secure, 100% offline Two-Factor Authentication (2FA) desktop 
 The application includes a local Google Authenticator migration decoder, allowing you to easily import all your existing accounts directly from exported Google Authenticator QR code screenshots in bulk.
 
 
-<img width="807" height="659" alt="2" src="https://github.com/user-attachments/assets/5effd85f-de23-49e3-bc2c-f6d39b3e00cd" />
-<img width="443" height="466" alt="1" src="https://github.com/user-attachments/assets/33125eff-b616-4fc4-983f-508b1bdf3a77" />
+<table align="center" border="0">
+  <tr>
+    <td align="center" valign="middle">
+      <img src="https://github.com/user-attachments/assets/5effd85f-de23-49e3-bc2c-f6d39b3e00cd" height="350" alt="Main Window" />
+    </td>
+    <td align="center" valign="middle">
+      <img src="https://github.com/user-attachments/assets/33125eff-b616-4fc4-983f-508b1bdf3a77" height="350" alt="Tray Window" />
+    </td>
+  </tr>
+</table>
 
 
 ## Features
